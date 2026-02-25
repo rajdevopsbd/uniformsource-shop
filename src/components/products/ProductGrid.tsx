@@ -1,5 +1,4 @@
-"use client";
-
+import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { Product } from '@/types';
@@ -24,13 +23,23 @@ export default function ProductGrid({ products, categoryFilter, moqFilter }: Pro
             {filteredProducts.map((product) => (
                 <div key={product.id} className="group flex flex-col bg-surface rounded-xl border border-zinc-800 overflow-hidden hover:border-zinc-700 transition-all">
                     <Link href={`/products/${product.id}`} className="block">
-                        {/* Image Placeholder/Container */}
+                        {/* Image Container */}
                         <div className="relative aspect-[4/5] bg-zinc-950 overflow-hidden">
-                            <div className="absolute inset-0 flex items-center justify-center text-zinc-800 font-mono text-xl uppercase tracking-widest italic select-none text-center px-4">
-                                {product.name}
-                            </div>
-                            {/* Real image would go here */}
-                            <div className="absolute top-4 left-4 px-2 py-1 bg-black/60 backdrop-blur-md rounded border border-white/10">
+                            {product.imageUrls && product.imageUrls[0] ? (
+                                <Image
+                                    src={product.imageUrls[0]}
+                                    alt={product.name}
+                                    fill
+                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center text-zinc-800 font-mono text-xl uppercase tracking-widest italic select-none text-center px-4">
+                                    {product.name}
+                                </div>
+                            )}
+
+                            {/* Category Badge */}
+                            <div className="absolute top-4 left-4 px-2 py-1 bg-black/60 backdrop-blur-md rounded border border-white/10 z-10">
                                 <span className="text-[10px] font-mono text-zinc-300 uppercase tracking-wider">{product.category}</span>
                             </div>
                         </div>
@@ -38,8 +47,9 @@ export default function ProductGrid({ products, categoryFilter, moqFilter }: Pro
 
                     <div className="p-6 flex flex-col flex-1">
                         <Link href={`/products/${product.id}`}>
-                            <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{product.name}</h3>
+                            <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-1">{product.name}</h3>
                         </Link>
+
 
 
                         <div className="grid grid-cols-2 gap-4 mb-6">
