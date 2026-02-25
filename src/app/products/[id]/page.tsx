@@ -1,6 +1,3 @@
-"use client";
-
-import { useParams } from 'next/navigation';
 import ProductDetail from '@/components/products/ProductDetail';
 import { Product } from '@/types';
 
@@ -91,13 +88,19 @@ const MOCK_PRODUCTS: Product[] = [
     }
 ];
 
-export default function ProductDetailPage() {
-    const params = useParams();
-    const product = MOCK_PRODUCTS.find(p => p.id === params.id);
+export async function generateStaticParams() {
+    return MOCK_PRODUCTS.map((product) => ({
+        id: product.id,
+    }));
+}
+
+export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const product = MOCK_PRODUCTS.find(p => p.id === id);
 
     if (!product) {
         return (
-            <div className="flex flex-col items-center justify-center min-vh-100 py-32">
+            <div className="flex flex-col items-center justify-center min-h-screen py-32">
                 <h1 className="text-4xl font-bold text-foreground mb-4">Product Not Found</h1>
                 <p className="text-muted">The product you are looking for does not exist or has been removed.</p>
             </div>
@@ -106,3 +109,4 @@ export default function ProductDetailPage() {
 
     return <ProductDetail product={product} />;
 }
+
