@@ -1,27 +1,19 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { useMemo } from 'react';
 import { Product } from '@/types';
+import { useQuoteStore } from '@/hooks/useQuoteStore';
 
 interface ProductGridProps {
     products: Product[];
-    categoryFilter?: string;
-    moqFilter?: number;
 }
 
-export default function ProductGrid({ products, categoryFilter, moqFilter }: ProductGridProps) {
-    const filteredProducts = useMemo(() => {
-        return products.filter(p => {
-            if (categoryFilter && p.category !== categoryFilter) return false;
-            if (moqFilter && p.MOQ > moqFilter) return false;
-            return true;
-        });
-    }, [products, categoryFilter, moqFilter]);
+export default function ProductGrid({ products }: ProductGridProps) {
+    const { addItem } = useQuoteStore();
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((product) => (
-                <div key={product.id} className="group flex flex-col bg-surface rounded-xl border border-zinc-800 overflow-hidden hover:border-zinc-700 transition-all">
+            {products.map((product) => (
+                <div key={product.id} className="group flex flex-col bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden hover:border-zinc-700 transition-all">
                     <Link href={`/products/${product.id}`} className="block">
                         {/* Image Container */}
                         <div className="relative aspect-[4/5] bg-zinc-950 overflow-hidden">
@@ -50,8 +42,6 @@ export default function ProductGrid({ products, categoryFilter, moqFilter }: Pro
                             <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-1">{product.name}</h3>
                         </Link>
 
-
-
                         <div className="grid grid-cols-2 gap-4 mb-6">
                             <div className="space-y-1">
                                 <p className="text-[10px] text-muted uppercase tracking-widest">Fabric</p>
@@ -74,13 +64,20 @@ export default function ProductGrid({ products, categoryFilter, moqFilter }: Pro
                         <div className="mt-auto pt-6 border-t border-zinc-800 flex items-center justify-between">
                             <div>
                                 <p className="text-[10px] text-muted uppercase tracking-widest mb-1">Estimated</p>
-                                <p className="text-lg font-mono font-bold text-accent">${product.basePriceUSD.toFixed(2)}<span className="text-xs text-muted font-normal ml-1">/ unit</span></p>
+                                <p className="text-lg font-mono font-bold text-accent">
+                                    {product.basePriceUSD ? `$${product.basePriceUSD.toFixed(2)}` : 'Contact for Price'}
+                                    <span className="text-xs text-muted font-normal ml-1">/ unit</span>
+                                </p>
                             </div>
                             <button
-                                className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm font-bold text-foreground hover:bg-zinc-800 transition-colors"
+                                className="px-4 py-2 bg-primary text-black rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors"
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    // Add to quote logic
+                                    addItem({
+                                        productId: product.id,
+                                        quantity: product.MOQ,
+                                        sizes: [],
+                                    });
                                 }}
                             >
                                 Add to Quote

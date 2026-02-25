@@ -13,7 +13,7 @@ service cloud.firestore {
     }
 
     match /products/{productId} {
-      allow read: if true; // Publicly viewable
+      allow read: if resource.data.active == true; // Only active products
       allow write: if isSignedIn() && hasRole('admin');
     }
 
@@ -25,6 +25,7 @@ service cloud.firestore {
         (hasRole('supplier') && resource.data.assignedSupplierId == request.auth.uid)
       );
       allow update: if isSignedIn() && hasRole('admin');
+      allow delete: if false; // Prevent deletion
     }
     
     match /quoteResponses/{responseId} {
