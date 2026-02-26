@@ -1,10 +1,10 @@
-const { onDocumentCreated } = require("firebase-functions/v2/firestore");
-const logger = require("firebase-functions/logger");
-const { initializeApp } = require("firebase-admin/app");
+import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import * as logger from "firebase-functions/logger";
+import { initializeApp } from "firebase-admin/app";
 
 initializeApp();
 
-exports.onQuoteRequestCreated = onDocumentCreated("quoteRequests/{requestId}", (event) => {
+export const onQuoteRequestCreated = onDocumentCreated("quoteRequests/{requestId}", (event) => {
     const snapshot = event.data;
     if (!snapshot) {
         logger.error("No data associated with the event");

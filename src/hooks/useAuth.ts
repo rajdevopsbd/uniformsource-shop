@@ -15,7 +15,7 @@ export function useAuth() {
             // For now, we simulate role determination
             user.getIdTokenResult().then((result) => {
                 setRole({
-                    role: (result.claims.role as any) || 'buyer',
+                    role: (result.claims.role as UserRole['role']) || 'buyer',
                     companyId: result.claims.companyId as string
                 });
             });

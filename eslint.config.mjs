@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "seed-data.js",
+    "test-firebase.js",
+    "check-db.js",
   ]),
 ]);
 

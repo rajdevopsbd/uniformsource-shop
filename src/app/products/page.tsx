@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import ProductGrid from '@/components/products/ProductGrid';
-import { Category } from '@/types';
-import { ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { Category, Product } from '@/types';
+import { SlidersHorizontal } from 'lucide-react';
 import { useCollection } from 'react-firebase-hooks/firestore';
 import { collection, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
@@ -25,7 +25,7 @@ export default function ProductsPage() {
     const products = values?.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-    })) as any[] || [];
+    })) as Product[] || [];
 
     // Client-side filtering for MOQ and Lead Time if needed, or we could add more Firestore queries.
     // Given B2B complexity, client-side refinement is often better for UX.
