@@ -1,24 +1,35 @@
 import ProductDetail from '@/components/products/ProductDetail';
 import { db } from '@/lib/firebase/config';
 import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { Product } from '@/types';
 
 export async function generateStaticParams() {
-    const productsRef = collection(db, 'products');
-    const q = query(productsRef, where('active', '==', true));
-    const querySnapshot = await getDocs(q);
-
-    return querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-    }));
+    try {
+        const productsRef = collection(db, 'products');
+        const q = query(productsRef, where('active', '==', true));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+        }));
+    } catch (err) {
+        console.error("Error in generateStaticParams:", err);
+        return [];
+    }
 }
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
     const docRef = doc(db, 'products', id);
-    const docSnap = await getDoc(docRef);
+    let docSnap;
 
-    if (!docSnap.exists() || !docSnap.data().active) {
+    try {
+        docSnap = await getDoc(docRef);
+    } catch (err) {
+        console.error("Error fetching product:", err);
+    }
+
+    if (!docSnap?.exists() || !docSnap.data().active) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen py-32">
                 <h1 className="text-4xl font-bold text-foreground mb-4">Product Not Found</h1>
@@ -30,9 +41,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     const product = {
         id: docSnap.id,
         ...docSnap.data()
-    } as any;
+    } as Product;
 
     return <ProductDetail product={product} />;
 }
-
-

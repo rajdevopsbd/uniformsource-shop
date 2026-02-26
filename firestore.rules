@@ -14,7 +14,7 @@ service cloud.firestore {
 
     // Products: public read (active only), admin write
     match /products/{productId} {
-      allow read: if resource.data.active == true;
+      allow read: if resource == null || resource.data.active == true;
       allow write: if isAdmin();
     }
 

@@ -76,11 +76,11 @@ export default function ProductDetail({ product }: { product: Product }) {
                         <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-[0.4em] mb-6 font-mono font-black">Technical Specs / JetBrains Mono</h3>
                         <div className="bg-zinc-950/50 rounded-2xl border border-zinc-800 overflow-hidden">
                             {[
-                                { label: 'Fabric', value: product.fabric },
-                                { label: 'Weight', value: `${product.gsm} GSM` },
-                                { label: 'MOQ', value: `${product.MOQ} Units` },
-                                { label: 'Lead Time', value: `${product.leadTimeDays} Days` },
-                                { label: 'Certifications', value: product.certifications.join(', ') }
+                                { label: 'Fabric', value: product.fabric || 'N/A' },
+                                { label: 'Weight', value: product.gsm ? `${product.gsm} GSM` : 'N/A' },
+                                { label: 'MOQ', value: product.MOQ ? `${product.MOQ} Units` : 'N/A' },
+                                { label: 'Lead Time', value: product.leadTimeDays ? `${product.leadTimeDays} Days` : 'N/A' },
+                                { label: 'Certifications', value: product.certifications?.join(', ') || 'N/A' }
                             ].map((spec, i) => (
                                 <div key={i} className={`grid grid-cols-3 border-zinc-900 ${i !== 4 ? 'border-b' : ''}`}>
                                     <div className="px-6 py-4 text-[10px] font-mono text-zinc-500 uppercase bg-zinc-900/30 flex items-center">
