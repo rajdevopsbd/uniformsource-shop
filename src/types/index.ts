@@ -17,13 +17,20 @@ export interface Product {
     sizeChart?: Record<string, any>;
 }
 
-export type QuoteStatus = 'new' | 'assigned' | 'quoted' | 'closed';
+export type QuoteStatus = 'new' | 'reviewing' | 'quoted' | 'closed';
 
 export interface QuoteRequestItem {
     productId: string;
+    productName?: string;
     quantity: number;
     sizes: string[];
     customizationNotes?: string;
+}
+
+export interface ActivityLogEntry {
+    action: string;
+    adminUid: string;
+    timestamp: any;
 }
 
 export interface QuoteRequest {
@@ -41,6 +48,9 @@ export interface QuoteRequest {
     attachments: string[];
     status: QuoteStatus;
     createdAt: any;
+    adminNotes?: string;
+    updatedAt?: any;
+    activityLog?: ActivityLogEntry[];
 }
 
 export interface QuoteResponse {

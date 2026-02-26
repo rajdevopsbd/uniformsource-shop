@@ -8,37 +8,44 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    function hasRole(role) {
-      return request.auth.token.role == role;
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.role == 'admin';
     }
 
+    // Products: public read (active only), admin write
     match /products/{productId} {
-      allow read: if resource.data.active == true; // Only active products
-      allow write: if isSignedIn() && hasRole('admin');
+      allow read: if resource.data.active == true;
+      allow write: if isAdmin();
     }
 
+    // Quote Requests:
+    //   - Anyone (incl. anonymous) can CREATE (for buyer RFQ submission)
+    //   - Admin can READ ALL and UPDATE (status, adminNotes, activityLog, etc.)
+    //   - Authenticated buyers can read their OWN quotes (matched by companyId)
+    //   - Deletion is permanently disabled
     match /quoteRequests/{requestId} {
-      allow create: if true; // Allow anonymous and logged-in users to submit
-      allow read: if isSignedIn() && (
-        hasRole('admin') || 
-        (hasRole('buyer') && request.auth.token.companyId == resource.data.companyId) ||
-        (hasRole('supplier') && resource.data.assignedSupplierId == request.auth.uid)
-      );
-      allow update: if isSignedIn() && hasRole('admin');
-      allow delete: if false; // Prevent deletion
+      allow create: if true;
+      allow read: if isAdmin() ||
+        (isSignedIn() && request.auth.token.role == 'buyer' &&
+         request.auth.token.companyId == resource.data.companyId);
+      allow update: if isAdmin();
+      allow delete: if false;
     }
     
+    // Quote Responses: admin and supplier read/create; buyer can read their own
     match /quoteResponses/{responseId} {
       allow create, read: if isSignedIn() && (
-        hasRole('admin') || 
-        hasRole('supplier') ||
-        (hasRole('buyer') && request.auth.token.companyId == get(/databases/$(database)/documents/quoteRequests/$(request.resource.data.quoteRequestId)).data.companyId)
+        request.auth.token.role == 'admin' ||
+        request.auth.token.role == 'supplier' ||
+        (request.auth.token.role == 'buyer' &&
+         request.auth.token.companyId == get(/databases/$(database)/documents/quoteRequests/$(request.resource.data.quoteRequestId)).data.companyId)
       );
     }
     
+    // Suppliers: any authenticated user can read; admin-only write
     match /suppliers/{supplierId} {
       allow read: if isSignedIn();
-      allow write: if isSignedIn() && hasRole('admin');
+      allow write: if isAdmin();
     }
   }
 }
